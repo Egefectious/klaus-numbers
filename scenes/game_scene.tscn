@@ -1,0 +1,150 @@
+[gd_scene load_steps=3 format=3 uid="uid://up44ll3gqwj4"]
+
+[ext_resource type="Script" uid="uid://uaclmgtjlu5q" path="res://GameScene.gd" id="1_onqr8"]
+[ext_resource type="Texture2D" uid="uid://dgvip4tpx7qfv" path="res://assets/background.jpg" id="2_ycayy"]
+
+[node name="GameScene" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_onqr8")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ycayy")
+
+[node name="MainLayout" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="LeftPanel" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ArtifactsBox" type="PanelContainer" parent="LeftPanel"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="LeftPanel/ArtifactsBox"]
+layout_mode = 2
+columns = 2
+
+[node name="Spacer" type="Control" parent="LeftPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BossContainer" type="VBoxContainer" parent="LeftPanel"]
+layout_mode = 2
+
+[node name="Portrait" type="TextureRect" parent="LeftPanel/BossContainer"]
+layout_mode = 2
+
+[node name="Speech" type="Label" parent="LeftPanel/BossContainer"]
+layout_mode = 2
+
+[node name="CenterPanel" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="LimboHeaders" type="HBoxContainer" parent="CenterPanel"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterPanel/LimboHeaders"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "L"
+horizontal_alignment = 1
+
+[node name="Label2" type="Label" parent="CenterPanel/LimboHeaders"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "I"
+horizontal_alignment = 1
+
+[node name="Label3" type="Label" parent="CenterPanel/LimboHeaders"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "M"
+horizontal_alignment = 1
+
+[node name="Label4" type="Label" parent="CenterPanel/LimboHeaders"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "B"
+horizontal_alignment = 1
+
+[node name="Label5" type="Label" parent="CenterPanel/LimboHeaders"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "O"
+horizontal_alignment = 1
+
+[node name="GridBoard" type="GridContainer" parent="CenterPanel"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+columns = 5
+
+[node name="BenchArea" type="Control" parent="CenterPanel"]
+custom_minimum_size = Vector2(0, 150)
+layout_mode = 2
+
+[node name="RightPanel" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Stats" type="VBoxContainer" parent="RightPanel"]
+layout_mode = 2
+
+[node name="Score" type="Label" parent="RightPanel/Stats"]
+layout_mode = 2
+
+[node name="Target" type="Label" parent="RightPanel/Stats"]
+layout_mode = 2
+
+[node name="Round" type="Label" parent="RightPanel/Stats"]
+layout_mode = 2
+
+[node name="ActiveSlabSlot" type="PanelContainer" parent="RightPanel"]
+custom_minimum_size = Vector2(120, 150)
+layout_mode = 2
+
+[node name="ActionButton" type="HBoxContainer" parent="RightPanel"]
+layout_mode = 2
+
+[node name="BtnDraw" type="Button" parent="RightPanel/ActionButton"]
+layout_mode = 2
+text = "DRAW"
+
+[node name="BtnBench" type="Button" parent="RightPanel/ActionButton"]
+layout_mode = 2
+text = "BENCH"
+
+[node name="BtnScore" type="Button" parent="RightPanel/ActionButton"]
+layout_mode = 2
+text = "SCORE"
+
+[node name="Currency" type="HBoxContainer" parent="RightPanel"]
+layout_mode = 2
+
+[node name="Obols" type="Label" parent="RightPanel/Currency"]
+layout_mode = 2
+
+[node name="Essence" type="Label" parent="RightPanel/Currency"]
+layout_mode = 2
