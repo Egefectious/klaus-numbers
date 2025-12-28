@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://gh5nb0plat7x"]
+[gd_scene load_steps=3 format=3 uid="uid://gh5nb0plat7x"]
+
+[ext_resource type="Script" uid="uid://djwkluxkflpqh" path="res://scripts/ui/SlabUI.gd" id="1_lmcr3"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vdr7f"]
 bg_color = Color(0.16470589, 0.16470589, 0.22745098, 1)
@@ -11,6 +13,8 @@ corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
+shadow_size = 5
+shadow_offset = Vector2(0, 4)
 
 [node name="SlabUI" type="Control"]
 custom_minimum_size = Vector2(100, 120)
@@ -18,6 +22,7 @@ layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+script = ExtResource("1_lmcr3")
 
 [node name="Background" type="Panel" parent="."]
 layout_mode = 1
@@ -41,15 +46,18 @@ offset_right = 20.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 48
+theme_override_font_sizes/font_size = 56
 text = "7"
 
 [node name="LetterLabel" type="Label" parent="."]
 layout_mode = 1
-offset_right = 40.0
-offset_bottom = 23.0
+offset_left = 6.0
+offset_top = 7.0
+offset_right = 46.0
+offset_bottom = 41.0
 theme_override_colors/font_color = Color(0.5717404, 0.039445173, 0.21454614, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 24
+text = "L"
 
 [node name="Glow" type="Control" parent="."]
 visible = false

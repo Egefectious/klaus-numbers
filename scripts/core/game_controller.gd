@@ -1,76 +1,60 @@
 extends Node
-class_name GameController
-
-# References to our child managers
-@onready var grid_manager: GridManager = $GridManager
-@onready var run_manager: RunManager = $RunManager
-@onready var score_manager: ScoreManager = $ScoreManager
-
-# References to UI (You'll link these in Editor)
-@onready var ui_message_log: Label = $UI/MessageLog 
 
 # State
 var total_run_score: int = 0
-var target_score: int = 5000 # Example target for Encounter 1
+var target_score: int = 5000 
 
 func _ready():
-	# 1. Initialize a test deck (We will make a real one later)
+	# 1. Connect to ScoreManager (THIS WAS MISSING!)
+	if not ScoreManager.is_connected("score_calculated", _on_score_calculated):
+		ScoreManager.connect("score_calculated", _on_score_calculated)
+
+	# 2. Initialize deck
 	var starter_deck = DeckFactory.create_starter_deck()
 	
-	# 2. Start the game loop
-	run_manager.start_encounter(starter_deck)
-	grid_manager.start_new_encounter() # Fills the grid with targets
-	
-	# 3. Connect Signals
-	run_manager.connect("slab_drawn", _on_slab_drawn)
-	
-func _on_slab_drawn(slab: SlabData):
-	# Update UI to show the slab hovering
-	print("Player drew: %s %d" % [slab.letter_type, slab.number_value])
+	# 3. Start the game loop
+	call_deferred("_start_game", starter_deck)
 
-# --- Input Handling (The Player's Clicks) ---
+func _start_game(deck):
+	RunManager.start_encounter(deck)
+	GridManager.start_new_encounter()
 
-# Called when player clicks a Grid Slot
+# --- INPUT HANDLERS ---
+
 func _on_grid_slot_clicked(coords: Vector2):
-	# CASE 1: Player is holding a Just-Drawn Slab
-	if run_manager.current_slab_holding != null:
-		var slab = run_manager.play_holding()
-		grid_manager.place_slab_on_grid(coords, slab)
-		
-	# CASE 2: Player selected a Slab from Bench (UI logic required here)
-	# For now, let's assume we have a variable 'selected_bench_slab_index'
-	# var slab = run_manager.play_from_bench(index)
-	# grid_manager.place_slab_on_grid(coords, slab)
+	if RunManager.current_slab_holding != null:
+		var slab = RunManager.play_holding()
+		GridManager.place_slab_on_grid(coords, slab)
+	else:
+		print("No slab selected!")
 
-# Called when player clicks "Score" Button
 func _on_score_button_pressed():
-	# 1. Calculate Score
-	score_manager.calculate_round_score(grid_manager.grid)
-	
-	# 2. Wait for signal back (see below)
+	# This triggers the calculation
+	ScoreManager.calculate_round_score(GridManager.grid)
 
-# Connect this to ScoreManager "score_calculated"
+# --- GAME LOOP LOGIC ---
+
 func _on_score_calculated(score_val: float, breakdown: Array):
+	# Now this will actually run!
 	total_run_score += int(score_val)
-	print("Scored this round: %d | Total: %d" % [score_val, total_run_score])
+	print("Scored: %d | Total: %d" % [score_val, total_run_score])
 	
-	# Logic: Did we beat the Boss?
 	if total_run_score >= target_score:
 		print(">>> ENCOUNTER WON! <<<")
-		run_manager.end_encounter()
-		# TODO: Trigger Shop Scene
+		RunManager.end_encounter()
+		# TODO: Load Shop Scene here
 	else:
-		# Logic: Continue to next round
-		var next_round = run_manager.current_round + 1
+		# Advance to next round
+		var next_round = RunManager.current_round + 1
 		
 		if next_round > 3:
-			print(">>> ENCOUNTER FAILED (Out of rounds) <<<")
-			# TODO: Trigger Game Over or Death Gift screen
+			print(">>> ENCOUNTER FAILED <<<")
+			# TODO: Game Over Logic
 		else:
-			print(">>> Board Wiped & Targets Rerolled. Starting Round %d <<<" % next_round)
+			print(">>> Starting Round %d <<<" % next_round)
 			
-			# 1. Reroll the grid targets
-			grid_manager.reroll_grid_targets()
+			# 1. Clear Board & New Targets
+			GridManager.reroll_grid_targets()
 			
-			# 2. Tell RunManager to reset draws for the new round
-			run_manager.start_round(next_round)
+			# 2. Reset Draws
+			RunManager.start_round(next_round)

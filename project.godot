@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="KlausNumbers"
+run/main_scene="uid://up44ll3gqwj4"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,6 +23,9 @@ RunManager="*res://scripts/core/run_manager.gd"
 ShopManager="*res://scripts/core/ShopManager.gd"
 LoopManager="*res://scripts/core/LoopManager.gd"
 BossManager="*res://scripts/core/BossManager.gd"
+GridManager="*res://scripts/core/grid_manager.gd"
+GameController="*res://scripts/core/game_controller.gd"
+ScoreManager="*res://scripts/core/score_manager.gd"
 
 [display]
 

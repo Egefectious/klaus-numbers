@@ -1,5 +1,5 @@
 extends Node
-class_name ScoreManager
+
 
 # Constants for the shapes
 const GRID_SIZE = 5

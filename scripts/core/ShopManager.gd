@@ -59,7 +59,8 @@ func _roll_rarity(level: int) -> String:
 	return "Legendary"
 
 func _get_random_item(type: String, target_rarity: String, max_unlock_level: int):
-	var database = ItemDB.slabs_db if type == "slabs" else ItemDB.artifacts_db
+	var db_node = get_node("/root/ItemDB") # Force find the node
+	var database = db_node.slabs_db if type == "slabs" else db_node.artifacts_db
 	var pool = []
 	
 	# Filter Database

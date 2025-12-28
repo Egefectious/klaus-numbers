@@ -29,7 +29,10 @@ func setup(data: SlabData):
 	
 	# Optional: Tint background slightly based on rarity or type
 	if data.rarity == "Legendary":
-		background.get_theme_stylebox().border_color = Color.GOLD
+
+		var new_style = background.get_theme_stylebox("panel").duplicate()
+		new_style.border_color = Color.GOLD
+		background.add_theme_stylebox_override("panel", new_style)
 
 func set_highlight(active: bool):
 	glow.visible = active

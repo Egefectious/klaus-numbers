@@ -1,5 +1,5 @@
 extends Node
-class_name GridManager
+
 
 # Configuration
 const GRID_SIZE = 5
@@ -163,3 +163,4 @@ func destroy_slot_contents(coords: Vector2):
 			print("Boss destroyed slab at: ", coords)
 			slot.current_slab = null # Poof, gone.
 			slot.temp_score_modifier = 0
+			
