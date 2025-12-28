@@ -127,7 +127,7 @@ func lock_slot(coords: Vector2):
 		var slot = grid[coords]
 		slot.is_locked = true
 		print("Grid Slot Locked: ", coords)
-		# TODO: Add visual lock sprite here later
+		emit_signal("grid_generated", grid)
 
 # 2. Shuffle Column Letters (The Mimic)
 func shuffle_column_letters():

@@ -312,7 +312,7 @@ icon_text = "⚡"
 glow_color = Color(0.78431374, 0.50980395, 1, 0.3019608)
 
 [node name="Spacer" type="Control" parent="MainLayout/RightPanel"]
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
 
 [node name="ActionsBox" type="VBoxContainer" parent="MainLayout/RightPanel"]

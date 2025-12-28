@@ -81,6 +81,18 @@ func _on_grid_generated(grid_data: Dictionary):
 			
 			slot_btn.add_child(lbl)
 			
+			if slot_data.is_locked:
+				slot_btn.disabled = true
+				slot_btn.modulate = Color(0.5, 0.5, 0.5) # Dim it visualy
+				
+				# Optional: Add a lock icon if you want
+				var lock_icon = Label.new()
+				lock_icon.text = "🔒"
+				lock_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+				lock_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+				lock_icon.set_anchors_preset(Control.PRESET_FULL_RECT)
+				slot_btn.add_child(lock_icon)
+			
 			# CONNECT CLICK SIGNAL
 			slot_btn.pressed.connect(func(): GameController._on_grid_slot_clicked(coords))
 			
@@ -148,7 +160,7 @@ func _check_clear_active_slot():
 		for c in active_slab_slot.get_children(): c.queue_free()
 
 func _on_score_update(total, breakdown):
-	score_lbl.text = "SCORE: " + str(total)
+	score_lbl.update_value(str(total))
 
 func _on_round_update(round_num):
-	round_lbl.text = "ROUND: %d/3" % round_num
+	round_lbl.update_value("%d/3" % round_num)

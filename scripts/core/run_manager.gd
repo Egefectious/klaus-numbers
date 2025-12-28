@@ -30,10 +30,10 @@ func start_encounter(full_deck: Array[SlabData]):
 func start_round(round_num: int):
 	current_round = round_num
 	current_draws_left = max_draws
-	
+	current_slab_holding = null
 	# Emit updates
 	emit_signal("draws_changed", current_draws_left, max_draws)
-	emit_signal("new_round_started", round_num) # <--- ADD THIS
+	emit_signal("new_round_started", round_num)
 	
 	print("--- ROUND %d START ---" % round_num)
 
