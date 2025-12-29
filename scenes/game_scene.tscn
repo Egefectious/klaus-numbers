@@ -1,7 +1,7 @@
-[gd_scene load_steps=17 format=3 uid="uid://up44ll3gqwj4"]
+[gd_scene load_steps=18 format=3 uid="uid://up44ll3gqwj4"]
 
-[ext_resource type="Script" uid="uid://uaclmgtjlu5q" path="res://GameScene.gd" id="1_onqr8"]
-[ext_resource type="Texture2D" uid="uid://dgvip4tpx7qfv" path="res://assets/background.jpg" id="2_ycayy"]
+[ext_resource type="Script" uid="uid://uaclmgtjlu5q" path="res://scripts/core/GameScene.gd" id="1_onqr8"]
+[ext_resource type="Shader" uid="uid://bfoem4ng2g2st" path="res://resources/gamescene.gdshader" id="2_rvs2r"]
 [ext_resource type="Shader" uid="uid://co7wwhfmus7ib" path="res://resources/TextureOverlay.gdshader" id="3_bw6k5"]
 [ext_resource type="Script" uid="uid://bc3ocaqavytqr" path="res://scripts/ui/floating_particles.gd" id="4_y3j0m"]
 [ext_resource type="Script" uid="uid://pw6qc3aixc5r" path="res://scripts/ui/corner_decorations.gd" id="5_y3j0m"]
@@ -12,6 +12,9 @@
 [ext_resource type="Script" uid="uid://cx1qju5yeh7nt" path="res://scripts/ui/enchanced_button.gd" id="9_mw25s"]
 [ext_resource type="Script" uid="uid://cjvq6qndjjwge" path="res://scripts/ui/bench_manager.gd" id="9_rvs2r"]
 [ext_resource type="Script" uid="uid://cr4x1847ogvfw" path="res://scripts/ui/current_display.gd" id="9_utbpp"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tqxxy"]
+shader = ExtResource("2_rvs2r")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rurhu"]
 shader = ExtResource("3_bw6k5")
@@ -72,15 +75,16 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.050980393, 0.050980393, 0.08235294, 1)
 
-[node name="BackGround" type="TextureRect" parent="."]
+[node name="BackGround" type="ColorRect" parent="."]
 modulate = Color(0.050980393, 0.050980393, 0.078431375, 1)
+material = SubResource("ShaderMaterial_tqxxy")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_bottom = 120.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("2_ycayy")
 
 [node name="TextureOverlay" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_rurhu")

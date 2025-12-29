@@ -18,22 +18,26 @@ func _ready():
 	apply_style()
 
 func apply_style():
+	# We use StyleBoxFlat to ensure we get Rounded Corners and Borders.
+	# (StyleBoxTexture caused the crash because it doesn't have bg_color or corner_radius)
 	var stylebox = StyleBoxFlat.new()
 	
-	# Background colors based on style
+	# Background colors based on HTML reference
 	match panel_style:
 		PanelStyle.DARK:
-			# linear-gradient(135deg, rgba(30, 30, 45, 0.8), rgba(20, 20, 35, 0.8))
-			stylebox.bg_color = Color(0.118, 0.118, 0.176, 0.8)
+			# Deep Blue-Black
+			stylebox.bg_color = Color("#1e1e2d") 
 		PanelStyle.DARKER:
-			stylebox.bg_color = Color(0.078, 0.078, 0.137, 0.8)
+			# Almost Black (for slots)
+			stylebox.bg_color = Color("#141423")
 		PanelStyle.ARTIFACT:
-			# linear-gradient(135deg, rgba(40, 40, 55, 0.9), rgba(25, 25, 40, 0.9))
-			stylebox.bg_color = Color(0.157, 0.157, 0.216, 0.9)
+			# Slightly purple tint
+			stylebox.bg_color = Color("#282837")
 		PanelStyle.STAT:
-			stylebox.bg_color = Color(0.118, 0.118, 0.176, 0.85)
+			# Lighter contrast
+			stylebox.bg_color = Color("#232333")
 	
-	# Corner radius
+	# Corner radius (Matches HTML rounded feel)
 	stylebox.corner_radius_top_left = 12
 	stylebox.corner_radius_top_right = 12
 	stylebox.corner_radius_bottom_left = 12
@@ -46,7 +50,7 @@ func apply_style():
 	stylebox.border_width_bottom = 2
 	stylebox.border_color = border_color
 	
-	# Shadow
+	# Shadow / Glow
 	if enable_glow:
 		stylebox.shadow_size = 8
 		stylebox.shadow_color = Color(0, 0, 0, 0.6)
@@ -57,9 +61,6 @@ func apply_style():
 	stylebox.content_margin_right = 16
 	stylebox.content_margin_top = 16
 	stylebox.content_margin_bottom = 16
-	
-	# Add subtle inner highlight
-	stylebox.draw_center = true
 	
 	# Apply the style
 	add_theme_stylebox_override("panel", stylebox)

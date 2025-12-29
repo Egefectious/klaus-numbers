@@ -1,20 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://gh5nb0plat7x"]
+[gd_scene load_steps=5 format=3 uid="uid://gh5nb0plat7x"]
 
 [ext_resource type="Script" uid="uid://djwkluxkflpqh" path="res://scripts/ui/SlabUI.gd" id="1_lmcr3"]
+[ext_resource type="Shader" uid="uid://evqcg4mdiuvp" path="res://resources/StoneCard.gdshader" id="2_xwoig"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_vdr7f"]
-bg_color = Color(0.16470589, 0.16470589, 0.22745098, 1)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(0.2901961, 0.2901961, 0.3529412, 1)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-shadow_size = 5
-shadow_offset = Vector2(0, 4)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rv7nb"]
+bg_color = Color(0.6, 0.6, 0.6, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_2cf2t"]
+shader = ExtResource("2_xwoig")
+shader_parameter/base_color = Color(0.15, 0.15, 0.18, 1)
+shader_parameter/glow_color = Color(0.3, 0.85, 1, 1)
+shader_parameter/active_state = 0.0
 
 [node name="SlabUI" type="Control"]
 custom_minimum_size = Vector2(100, 120)
@@ -31,7 +27,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_vdr7f")
+theme_override_styles/panel = SubResource("StyleBoxFlat_rv7nb")
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+material = SubResource("ShaderMaterial_2cf2t")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="NumberLabel" type="Label" parent="."]
 layout_mode = 1

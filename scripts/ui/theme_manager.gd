@@ -2,6 +2,9 @@ extends Node
 
 # Global theme manager for Death's Casino aesthetic
 # Attach this to an autoload singleton or call from main scene
+var font_heading = load("res://fonts/PirataOne-Regular.ttf") 
+var font_body = load("res://fonts/AlegreyaSans-Black.ttf")
+var font_numbers = load("res://fonts/AlegreyaSans-Bold.ttf")
 
 const FONT_PRIMARY = "res://fonts/primary_font.ttf"  # You'll need to add fonts
 const FONT_DISPLAY = "res://fonts/display_font.ttf"
@@ -28,7 +31,7 @@ const COLOR_COMMON = Color(0.5, 0.5, 0.6, 0.5)         # Gray
 
 static func get_random_rune_color() -> Color:
 	var colors = [COLOR_RUNE_CYAN, COLOR_RUNE_PURPLE, COLOR_RUNE_ORANGE, 
-	              COLOR_RUNE_PINK, COLOR_RUNE_GREEN]
+				  COLOR_RUNE_PINK, COLOR_RUNE_GREEN]
 	return colors[randi() % colors.size()]
 
 static func create_button_style(is_primary: bool = false) -> StyleBoxFlat:
@@ -76,3 +79,14 @@ static func create_button_hover_style(is_primary: bool = false) -> StyleBoxFlat:
 		style.shadow_color = Color(0.4, 0.4, 0.5, 0.3)
 	
 	return style
+
+func apply_global_theme(node: Node):
+	# Call this in your GameScene _ready()
+	var theme = Theme.new()
+	
+	# Set default fonts
+	theme.set_default_font(font_body)
+	theme.set_default_font_size(16)
+	
+	# Apply to the root node (GameScene)
+	node.theme = theme

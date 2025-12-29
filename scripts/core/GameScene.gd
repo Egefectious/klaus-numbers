@@ -11,6 +11,8 @@ extends Control
 var slab_scene = preload("res://scenes/ui/SlabUI.tscn")
 
 func _ready():
+	
+	ThemeManager.apply_global_theme(self)
 	# 1. Connect Managers
 	if not GridManager.is_connected("grid_generated", _on_grid_generated):
 		GridManager.connect("grid_generated", _on_grid_generated)
@@ -26,8 +28,15 @@ func _ready():
 		
 	if not ScoreManager.is_connected("score_calculated", _on_score_update):
 		ScoreManager.connect("score_calculated", _on_score_update)
-	
-	# 2. Connect Buttons
+
+	var index = 0
+	# Loop through ALL children
+	for child in get_children():
+		# ONLY animate if it is actually a Label
+		if child is Label:
+			animate_letter(child, index * 0.1)
+			index += 1
+		
 	var actions = $MainLayout/RightPanel/ActionsBox
 	actions.get_node("DRAW").pressed.connect(func(): RunManager.draw_slab())
 	actions.get_node("BENCH").pressed.connect(func(): RunManager.move_holding_to_bench())
@@ -40,7 +49,19 @@ func _ready():
 		_on_bench_updated(RunManager.bench)
 
 # --- VISUAL GENERATION ---
-
+func animate_letter(label: Label, delay: float):
+	var tween = create_tween().set_loops()
+	
+	# Wait for start delay
+	tween.tween_interval(delay)
+	
+	# Pulse effect (Glow + Scale)
+	tween.tween_property(label, "modulate:a", 1.0, 1.0)
+	tween.parallel().tween_property(label, "scale", Vector2(1.1, 1.1), 1.0).set_trans(Tween.TRANS_SINE)
+	
+	tween.tween_property(label, "modulate:a", 0.7, 1.0)
+	tween.parallel().tween_property(label, "scale", Vector2(1.0, 1.0), 1.0).set_trans(Tween.TRANS_SINE)
+	
 func _on_grid_generated(grid_data: Dictionary):
 	# Clear board
 	for c in grid_board.get_children(): c.queue_free()
