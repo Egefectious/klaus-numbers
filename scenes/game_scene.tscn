@@ -1,61 +1,357 @@
-[gd_scene load_steps=18 format=3 uid="uid://up44ll3gqwj4"]
+[gd_scene load_steps=16 format=3 uid="uid://up44ll3gqwj4"]
 
 [ext_resource type="Script" uid="uid://uaclmgtjlu5q" path="res://scripts/core/GameScene.gd" id="1_onqr8"]
-[ext_resource type="Shader" uid="uid://bfoem4ng2g2st" path="res://resources/gamescene.gdshader" id="2_rvs2r"]
+[ext_resource type="Texture2D" uid="uid://dgvip4tpx7qfv" path="res://assets/background.jpg" id="2_ycayy"]
 [ext_resource type="Shader" uid="uid://co7wwhfmus7ib" path="res://resources/TextureOverlay.gdshader" id="3_bw6k5"]
 [ext_resource type="Script" uid="uid://bc3ocaqavytqr" path="res://scripts/ui/floating_particles.gd" id="4_y3j0m"]
 [ext_resource type="Script" uid="uid://pw6qc3aixc5r" path="res://scripts/ui/corner_decorations.gd" id="5_y3j0m"]
-[ext_resource type="Script" uid="uid://bl8814rtr81eg" path="res://scripts/ui/styled_panel.gd" id="6_kk2rg"]
 [ext_resource type="Texture2D" uid="uid://b6g0b14bxh5he" path="res://icon.svg" id="7_b5spy"]
 [ext_resource type="Script" uid="uid://cj610n0q5ptju" path="res://scripts/ui/fancy_stat_box.gd" id="8_b5spy"]
-[ext_resource type="Script" uid="uid://b35uputnrh5hn" path="res://scripts/ui/grid_manager_enhanced.gd" id="8_tcjrq"]
 [ext_resource type="Script" uid="uid://cx1qju5yeh7nt" path="res://scripts/ui/enchanced_button.gd" id="9_mw25s"]
-[ext_resource type="Script" uid="uid://cjvq6qndjjwge" path="res://scripts/ui/bench_manager.gd" id="9_rvs2r"]
 [ext_resource type="Script" uid="uid://cr4x1847ogvfw" path="res://scripts/ui/current_display.gd" id="9_utbpp"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tqxxy"]
-shader = ExtResource("2_rvs2r")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_rurhu"]
 shader = ExtResource("3_bw6k5")
 shader_parameter/opacity = 0.3
 shader_parameter/scale = 2.0
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_b5spy"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_utbpp"]
-content_margin_left = 20.0
-content_margin_top = 12.0
-content_margin_right = 20.0
-content_margin_bottom = 12.0
-bg_color = Color(0.1254902, 0.17254902, 0.23137255, 0.9019608)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_artifact"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.118, 0.118, 0.176, 0.85)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.36078432, 0.69803923, 0.90588236, 0.9098039)
+border_color = Color(0.314, 0.353, 0.431, 0.5)
 corner_radius_top_left = 8
 corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
-shadow_color = Color(0.28235295, 0.4862745, 0.8352941, 0.39215687)
 shadow_size = 8
+shadow_offset = Vector2(0, 4)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_kk2rg"]
-content_margin_left = 20.0
-content_margin_top = 12.0
-content_margin_right = 20.0
-content_margin_bottom = 12.0
-bg_color = Color(0.14509805, 0.2, 0.26666668, 0.8901961)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_boss_panel"]
+content_margin_left = 16.0
+content_margin_top = 16.0
+content_margin_right = 16.0
+content_margin_bottom = 16.0
+bg_color = Color(0.15, 0.15, 0.2, 0.9)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.34901962, 0.62352943, 0.8627451, 0.8117647)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+border_color = Color(0.5, 0.3, 0.3, 0.6)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0.5, 0.1, 0.1, 0.4)
+shadow_size = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_grid_frame"]
+content_margin_left = 25.0
+content_margin_top = 25.0
+content_margin_right = 25.0
+content_margin_bottom = 25.0
+bg_color = Color(0.08, 0.08, 0.12, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.25, 0.28, 0.35, 0.7)
+corner_radius_top_left = 15
+corner_radius_top_right = 15
+corner_radius_bottom_right = 15
+corner_radius_bottom_left = 15
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 15
+shadow_offset = Vector2(0, 6)
+
+[sub_resource type="GDScript" id="GDScript_utbpp"]
+script/source = "extends GridContainer
+
+# Manages the 5x5 grid of rune cards
+
+var cards: Array = []
+var rune_card_script
+var selected_cards: Array = []
+
+signal card_selected(card)
+signal cards_scored(total_score)
+
+func _ready():
+	# Load the rune card script
+	rune_card_script = load(\"res://scripts/ui/rune_card.gd\")
+	
+	columns = 5
+	add_theme_constant_override(\"h_separation\", 10)
+	add_theme_constant_override(\"v_separation\", 10)
+	
+	# Generate initial grid
+	populate_grid()
+
+func populate_grid():
+	# Clear existing cards
+	for child in get_children():
+		child.queue_free()
+	cards.clear()
+	
+	# Create 5x5 grid (25 cards)
+	for row in range(5):
+		for col in range(5):
+			create_card(row, col)
+
+func create_card(row: int, col: int):
+	var card = PanelContainer.new()
+	card.set_script(rune_card_script)
+	
+	# Randomly make some cards inactive (like the HTML)
+	card.is_active = randf() > 0.4
+	
+	# Connect signals
+	card.card_clicked.connect(_on_card_clicked)
+	card.card_hovered.connect(_on_card_hovered)
+	
+	add_child(card)
+	cards.append(card)
+	
+	# Start subtle pulse animation on active cards
+	if card.is_active:
+		card.call_deferred(\"pulse_glow\")
+
+func _on_card_clicked(card):
+	if not card.is_active:
+		return
+	
+	# Toggle selection
+	if card in selected_cards:
+		selected_cards.erase(card)
+		# Visual feedback for deselection
+	else:
+		selected_cards.append(card)
+		# Visual feedback for selection
+	
+	card_selected.emit(card)
+	
+	# Show score preview
+	show_score_preview(card)
+
+func _on_card_hovered(card):
+	# Optional: show tooltip or highlight valid moves
+	pass
+
+func show_score_preview(card):
+	# Calculate what this card would score
+	var score = calculate_card_score(card)
+	
+	# Create floating score text (like the HTML)
+	var score_label = Label.new()
+	score_label.text = \"+%d\" % score
+	score_label.add_theme_font_size_override(\"font_size\", 24)
+	score_label.add_theme_color_override(\"font_color\", Color(1.0, 0.9, 0.4))
+	score_label.add_theme_color_override(\"font_shadow_color\", Color(0, 0, 0, 0.8))
+	score_label.add_theme_constant_override(\"shadow_offset_x\", 0)
+	score_label.add_theme_constant_override(\"shadow_offset_y\", 2)
+	score_label.add_theme_constant_override(\"shadow_outline_size\", 4)
+	
+	# Position above card
+	var card_global_pos = card.global_position
+	score_label.global_position = card_global_pos + Vector2(card.size.x / 2 - 30, -40)
+	
+	get_tree().root.add_child(score_label)
+	
+	# Animate upward and fade out
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(score_label, \"position:y\", score_label.position.y - 50, 1.0)
+	tween.tween_property(score_label, \"modulate:a\", 0.0, 1.0)
+	
+	await tween.finished
+	score_label.queue_free()
+
+func calculate_card_score(card) -> int:
+	# Placeholder scoring logic
+	return card.card_value if card.card_value > 0 else 250
+
+func score_selected_cards():
+	if selected_cards.is_empty():
+		return
+	
+	var total_score = 0
+	for card in selected_cards:
+		total_score += calculate_card_score(card)
+		# Animate card removal
+		animate_card_removal(card)
+	
+	cards_scored.emit(total_score)
+	selected_cards.clear()
+
+func animate_card_removal(card):
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.set_ease(Tween.EASE_IN)
+	tween.set_trans(Tween.TRANS_BACK)
+	
+	tween.tween_property(card, \"scale\", Vector2.ZERO, 0.3)
+	tween.tween_property(card, \"modulate:a\", 0.0, 0.3)
+	
+	await tween.finished
+	card.set_active(false)
+	card.scale = Vector2.ONE
+	card.modulate.a = 1.0
+
+func refill_grid():
+	# Reactivate cards or spawn new ones
+	for card in cards:
+		if not card.is_active:
+			card.randomize_rune()
+			card.set_active(true)
+			
+			# Spawn animation
+			card.scale = Vector2.ZERO
+			var spawn = create_tween()
+			spawn.set_ease(Tween.EASE_OUT)
+			spawn.set_trans(Tween.TRANS_BACK)
+			spawn.tween_property(card, \"scale\", Vector2.ONE, 0.4)
+			
+			card.call_deferred(\"pulse_glow\")
+
+func clear_selection():
+	selected_cards.clear()
+"
+
+[sub_resource type="GDScript" id="GDScript_mw25s"]
+script/source = "extends Control
+
+# Manages bench cards in a fan layout
+
+var bench_card_script
+var bench_cards: Array = []
+const MAX_BENCH_SIZE = 6
+
+signal bench_card_selected(card)
+
+func _ready():
+	bench_card_script = load(\"res://scripts/ui/bench_card.gd\")
+	custom_minimum_size = Vector2(0, 200)
+	populate_bench()
+
+func populate_bench():
+	# Clear existing
+	for child in get_children():
+		child.queue_free()
+	bench_cards.clear()
+	
+	# Create 6 bench cards
+	for i in range(MAX_BENCH_SIZE):
+		create_bench_card(i)
+
+func create_bench_card(index: int):
+	var card = PanelContainer.new()
+	card.set_script(bench_card_script)
+	
+	# Calculate fan position and rotation
+	var center_x = size.x / 2
+	var card_width = 80
+	var spacing = 90
+	var total_width = (MAX_BENCH_SIZE - 1) * spacing
+	var start_x = center_x - total_width / 2
+	
+	# Position
+	var x_pos = start_x + index * spacing
+	var y_offset = abs(index - (MAX_BENCH_SIZE - 1) / 2.0) * 5  # Arc effect
+	
+	card.position = Vector2(x_pos, size.y - 130 + y_offset)
+	
+	# Rotation for fan effect
+	var rotation_deg = (index - (MAX_BENCH_SIZE - 1) / 2.0) * 3
+	card.rotation_angle = rotation_deg
+	
+	# Connect signal
+	card.bench_card_clicked.connect(_on_bench_card_clicked)
+	
+	add_child(card)
+	bench_cards.append(card)
+
+func _on_bench_card_clicked(card):
+	bench_card_selected.emit(card)
+	# Play selection animation
+	flash_selection(card)
+
+func flash_selection(card):
+	var flash_tween = create_tween()
+	flash_tween.tween_property(card, \"modulate\", Color(1.5, 1.5, 1.5), 0.1)
+	flash_tween.tween_property(card, \"modulate\", Color.WHITE, 0.2)
+
+func add_card_to_bench(rune_symbol: String, rune_color: Color):
+	if bench_cards.size() >= MAX_BENCH_SIZE:
+		return  # Bench full
+	
+	var card = PanelContainer.new()
+	card.set_script(bench_card_script)
+	card.rune_symbol = rune_symbol
+	card.rune_color = rune_color
+	
+	# Position at the end
+	var index = bench_cards.size()
+	var center_x = size.x / 2
+	var spacing = 90
+	var total_width = (MAX_BENCH_SIZE - 1) * spacing
+	var start_x = center_x - total_width / 2
+	var x_pos = start_x + index * spacing
+	var y_offset = abs(index - (MAX_BENCH_SIZE - 1) / 2.0) * 5
+	
+	card.position = Vector2(x_pos, size.y - 130 + y_offset)
+	card.rotation_angle = (index - (MAX_BENCH_SIZE - 1) / 2.0) * 3
+	
+	card.bench_card_clicked.connect(_on_bench_card_clicked)
+	
+	add_child(card)
+	bench_cards.append(card)
+	
+	# Spawn animation
+	card.scale = Vector2.ZERO
+	var spawn = create_tween()
+	spawn.set_ease(Tween.EASE_OUT)
+	spawn.set_trans(Tween.TRANS_BACK)
+	spawn.tween_property(card, \"scale\", Vector2.ONE, 0.4)
+
+func remove_card(card):
+	if card not in bench_cards:
+		return
+	
+	bench_cards.erase(card)
+	
+	# Remove animation
+	var remove_tween = create_tween()
+	remove_tween.set_parallel(true)
+	remove_tween.tween_property(card, \"scale\", Vector2.ZERO, 0.3)
+	remove_tween.tween_property(card, \"modulate:a\", 0.0, 0.3)
+	
+	await remove_tween.finished
+	card.queue_free()
+	
+	# Reposition remaining cards
+	reposition_cards()
+
+func reposition_cards():
+	for i in range(bench_cards.size()):
+		var card = bench_cards[i]
+		var center_x = size.x / 2
+		var spacing = 90
+		var total_width = (MAX_BENCH_SIZE - 1) * spacing
+		var start_x = center_x - total_width / 2
+		var x_pos = start_x + i * spacing
+		var y_offset = abs(i - (MAX_BENCH_SIZE - 1) / 2.0) * 5
+		
+		var reposition = create_tween()
+		reposition.set_parallel(true)
+		reposition.tween_property(card, \"position\", Vector2(x_pos, size.y - 130 + y_offset), 0.3)
+		reposition.tween_property(card, \"rotation_degrees\", (i - (MAX_BENCH_SIZE - 1) / 2.0) * 3, 0.3)
+"
 
 [node name="GameScene" type="Control"]
 layout_mode = 3
@@ -75,16 +371,15 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.050980393, 0.050980393, 0.08235294, 1)
 
-[node name="BackGround" type="ColorRect" parent="."]
+[node name="BackGround" type="TextureRect" parent="."]
 modulate = Color(0.050980393, 0.050980393, 0.078431375, 1)
-material = SubResource("ShaderMaterial_tqxxy")
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = 120.0
 grow_horizontal = 2
 grow_vertical = 2
+texture = ExtResource("2_ycayy")
 
 [node name="TextureOverlay" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_rurhu")
@@ -95,15 +390,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Vignette" type="ColorRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.003921569, 0.003921569, 0.003921569, 0.015686275)
-
 [node name="FloatingParticles" type="Node2D" parent="."]
 script = ExtResource("4_y3j0m")
 
@@ -113,75 +399,90 @@ offset_right = 40.0
 offset_bottom = 40.0
 script = ExtResource("5_y3j0m")
 
-[node name="MainLayout" type="HBoxContainer" parent="."]
+[node name="MainLayout" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 20
-
-[node name="MainMargin" type="MarginContainer" parent="MainLayout"]
-layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
 
-[node name="LeftPanel" type="VBoxContainer" parent="MainLayout"]
+[node name="ContentGrid" type="HBoxContainer" parent="MainLayout"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="LeftPanel" type="VBoxContainer" parent="MainLayout/ContentGrid"]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
 
-[node name="ArtifactsBox" type="PanelContainer" parent="MainLayout/LeftPanel"]
+[node name="ArtifactsBox" type="PanelContainer" parent="MainLayout/ContentGrid/LeftPanel"]
 layout_mode = 2
-script = ExtResource("6_kk2rg")
+theme_override_styles/panel = SubResource("StyleBoxFlat_artifact")
 
-[node name="ArtifactsContent" type="VBoxContainer" parent="MainLayout/LeftPanel/ArtifactsBox"]
+[node name="ArtifactsContent" type="VBoxContainer" parent="MainLayout/ContentGrid/LeftPanel/ArtifactsBox"]
 layout_mode = 2
+theme_override_constants/separation = 12
 
-[node name="ArtifactsHeader" type="Label" parent="MainLayout/LeftPanel/ArtifactsBox/ArtifactsContent"]
+[node name="ArtifactsHeader" type="Label" parent="MainLayout/ContentGrid/LeftPanel/ArtifactsBox/ArtifactsContent"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7490196, 0.61960787, 0.5019608, 1)
-theme_override_constants/line_spacing = 3
 theme_override_font_sizes/font_size = 14
 text = "ARTIFACTS"
 
-[node name="GridContainer" type="GridContainer" parent="MainLayout/LeftPanel/ArtifactsBox/ArtifactsContent"]
+[node name="ArtifactsList" type="VBoxContainer" parent="MainLayout/ContentGrid/LeftPanel/ArtifactsBox/ArtifactsContent"]
 layout_mode = 2
-columns = 2
+theme_override_constants/separation = 8
 
-[node name="Spacer" type="Control" parent="MainLayout/LeftPanel"]
-custom_minimum_size = Vector2(0, 200)
+[node name="Spacer" type="Control" parent="MainLayout/ContentGrid/LeftPanel"]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="BossContainer" type="VBoxContainer" parent="MainLayout/LeftPanel"]
+[node name="BossPanel" type="PanelContainer" parent="MainLayout/ContentGrid/LeftPanel"]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_boss_panel")
 
-[node name="BossPanel" type="PanelContainer" parent="MainLayout/LeftPanel/BossContainer"]
+[node name="BossContent" type="VBoxContainer" parent="MainLayout/ContentGrid/LeftPanel/BossPanel"]
 layout_mode = 2
-script = ExtResource("6_kk2rg")
-panel_style = 1
+theme_override_constants/separation = 12
 
-[node name="Portrait" type="TextureRect" parent="MainLayout/LeftPanel/BossContainer/BossPanel"]
+[node name="BossHeader" type="Label" parent="MainLayout/ContentGrid/LeftPanel/BossPanel/BossContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 14
+text = "THE GUIDE"
+
+[node name="Portrait" type="TextureRect" parent="MainLayout/ContentGrid/LeftPanel/BossPanel/BossContent"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 texture = ExtResource("7_b5spy")
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Speech" type="Label" parent="MainLayout/LeftPanel/BossContainer/BossPanel"]
+[node name="Speech" type="Label" parent="MainLayout/ContentGrid/LeftPanel/BossPanel/BossContent"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_font_sizes/font_size = 12
 text = "I await your move...."
+autowrap_mode = 2
 
-[node name="CenterPanel" type="VBoxContainer" parent="MainLayout"]
+[node name="CenterPanel" type="VBoxContainer" parent="MainLayout/ContentGrid"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 15
 
-[node name="LimboHeaders" type="HBoxContainer" parent="MainLayout/CenterPanel"]
+[node name="LimboHeaders" type="HBoxContainer" parent="MainLayout/ContentGrid/CenterPanel"]
 layout_mode = 2
 theme_override_constants/separation = 8
 alignment = 1
 
-[node name="Label" type="Label" parent="MainLayout/CenterPanel/LimboHeaders"]
+[node name="Label" type="Label" parent="MainLayout/ContentGrid/CenterPanel/LimboHeaders"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6723437, 0, 0.23866248, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.79607844)
@@ -191,7 +492,7 @@ theme_override_font_sizes/font_size = 48
 text = "L"
 horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="MainLayout/CenterPanel/LimboHeaders"]
+[node name="Label2" type="Label" parent="MainLayout/ContentGrid/CenterPanel/LimboHeaders"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6061149, 0.34655234, 0.093806885, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.79607844)
@@ -201,7 +502,7 @@ theme_override_font_sizes/font_size = 48
 text = "I"
 horizontal_alignment = 1
 
-[node name="Label3" type="Label" parent="MainLayout/CenterPanel/LimboHeaders"]
+[node name="Label3" type="Label" parent="MainLayout/ContentGrid/CenterPanel/LimboHeaders"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0.02745098, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.79607844)
@@ -211,7 +512,7 @@ theme_override_font_sizes/font_size = 48
 text = "M"
 horizontal_alignment = 1
 
-[node name="Label4" type="Label" parent="MainLayout/CenterPanel/LimboHeaders"]
+[node name="Label4" type="Label" parent="MainLayout/ContentGrid/CenterPanel/LimboHeaders"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 1, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.79607844)
@@ -221,7 +522,7 @@ theme_override_font_sizes/font_size = 48
 text = "B"
 horizontal_alignment = 1
 
-[node name="Label5" type="Label" parent="MainLayout/CenterPanel/LimboHeaders"]
+[node name="Label5" type="Label" parent="MainLayout/ContentGrid/CenterPanel/LimboHeaders"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.64126736, 0.0012683416, 0.78117305, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.79607844)
@@ -231,53 +532,50 @@ theme_override_font_sizes/font_size = 48
 text = "O"
 horizontal_alignment = 1
 
-[node name="GridFrame" type="PanelContainer" parent="MainLayout/CenterPanel"]
+[node name="GridContainer" type="PanelContainer" parent="MainLayout/ContentGrid/CenterPanel"]
 layout_mode = 2
 size_flags_vertical = 3
-script = ExtResource("6_kk2rg")
-border_color = Color(0.39215687, 0.45490196, 0.62352943, 0.59607846)
+theme_override_styles/panel = SubResource("StyleBoxFlat_grid_frame")
 
-[node name="GridBoard" type="GridContainer" parent="MainLayout/CenterPanel/GridFrame"]
+[node name="GridBoard" type="GridContainer" parent="MainLayout/ContentGrid/CenterPanel/GridContainer"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/h_separation = 10
-theme_override_constants/v_separation = 10
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
 columns = 5
-script = ExtResource("8_tcjrq")
+script = SubResource("GDScript_utbpp")
 
-[node name="BenchArea" type="Control" parent="MainLayout/CenterPanel"]
-custom_minimum_size = Vector2(0, 200)
+[node name="BenchSection" type="VBoxContainer" parent="MainLayout/ContentGrid/CenterPanel"]
+custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
-script = ExtResource("9_rvs2r")
+theme_override_constants/separation = 8
 
-[node name="BenchLabel" type="Label" parent="MainLayout/CenterPanel/BenchArea"]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_top = 10.0
-offset_bottom = 30.0
-grow_horizontal = 2
+[node name="BenchLabel" type="Label" parent="MainLayout/ContentGrid/CenterPanel/BenchSection"]
+layout_mode = 2
 theme_override_colors/font_color = Color(0.7254902, 0.6039216, 0.49803922, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_font_sizes/font_size = 12
 text = "BENCH"
 horizontal_alignment = 1
 
-[node name="RightPanel" type="VBoxContainer" parent="MainLayout"]
+[node name="BenchArea" type="Control" parent="MainLayout/ContentGrid/CenterPanel/BenchSection"]
+layout_mode = 2
+size_flags_vertical = 3
+script = SubResource("GDScript_mw25s")
+
+[node name="RightPanel" type="VBoxContainer" parent="MainLayout/ContentGrid"]
 custom_minimum_size = Vector2(340, 0)
 layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 16
 
-[node name="StatsBox" type="VBoxContainer" parent="MainLayout/RightPanel"]
+[node name="StatsPanel" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel"]
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_artifact")
 
-[node name="StatsPanel" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox"]
-layout_mode = 2
-script = ExtResource("6_kk2rg")
-
-[node name="StatsContent" type="VBoxContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel"]
+[node name="StatsContent" type="VBoxContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="ScoreStat" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent"]
+[node name="ScoreStat" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent"]
 layout_mode = 2
 script = ExtResource("8_b5spy")
 stat_label = "SCORE"
@@ -285,29 +583,31 @@ stat_value = "14500"
 icon_text = "👑"
 is_primary = true
 
-[node name="TargetStat" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent"]
+[node name="TargetStat" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent"]
 layout_mode = 2
 script = ExtResource("8_b5spy")
 stat_label = "TARGET"
 stat_value = "20000"
 
-[node name="SmallStatsRow" type="HBoxContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent"]
+[node name="SmallStatsRow" type="HBoxContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="RoundStat" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent/SmallStatsRow"]
+[node name="RoundStat" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/SmallStatsRow"]
 layout_mode = 2
+size_flags_horizontal = 3
 script = ExtResource("8_b5spy")
 stat_label = "ROUND"
-stat_value = "3"
+stat_value = "1/3"
 
-[node name="EncounterStat" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent/SmallStatsRow"]
+[node name="EncounterStat" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/SmallStatsRow"]
 layout_mode = 2
+size_flags_horizontal = 3
 script = ExtResource("8_b5spy")
 stat_label = "ENCOUNTER"
 stat_value = "2/5"
 
-[node name="DrawsStat" type="PanelContainer" parent="MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent"]
+[node name="DrawsStat" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent"]
 layout_mode = 2
 script = ExtResource("8_b5spy")
 stat_label = "DRAWS LEFT"
@@ -315,55 +615,46 @@ stat_value = "7"
 icon_text = "⚡"
 glow_color = Color(0.78431374, 0.50980395, 1, 0.3019608)
 
-[node name="Spacer" type="Control" parent="MainLayout/RightPanel"]
-custom_minimum_size = Vector2(0, 20)
-layout_mode = 2
-
-[node name="ActionsBox" type="VBoxContainer" parent="MainLayout/RightPanel"]
+[node name="ActionsBox" type="VBoxContainer" parent="MainLayout/ContentGrid/RightPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="DRAW" type="Button" parent="MainLayout/RightPanel/ActionsBox"]
+[node name="DRAW" type="Button" parent="MainLayout/ContentGrid/RightPanel/ActionsBox"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_b5spy")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_utbpp")
 text = "DRAW"
 script = ExtResource("9_mw25s")
 is_primary = true
 
-[node name="BENCH" type="Button" parent="MainLayout/RightPanel/ActionsBox"]
+[node name="BENCH" type="Button" parent="MainLayout/ContentGrid/RightPanel/ActionsBox"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_styles/pressed = SubResource("StyleBoxFlat_b5spy")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_utbpp")
 text = "BENCH"
 script = ExtResource("9_mw25s")
 
-[node name="SCORE" type="Button" parent="MainLayout/RightPanel/ActionsBox"]
+[node name="SCORE" type="Button" parent="MainLayout/ContentGrid/RightPanel/ActionsBox"]
 custom_minimum_size = Vector2(0, 50)
 layout_mode = 2
-theme_override_styles/normal = SubResource("StyleBoxFlat_kk2rg")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_b5spy")
-theme_override_styles/hover_mirrored = SubResource("StyleBoxFlat_utbpp")
 text = "SCORE"
 script = ExtResource("9_mw25s")
 
-[node name="ActiveSlabSlot" type="PanelContainer" parent="MainLayout/RightPanel"]
+[node name="ActiveSlabSlot" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel"]
+visible = false
 custom_minimum_size = Vector2(120, 150)
 layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_artifact")
 
-[node name="CurrencyContainer" type="HBoxContainer" parent="MainLayout/RightPanel"]
+[node name="CurrencyContainer" type="HBoxContainer" parent="MainLayout/ContentGrid/RightPanel"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="ObolsDisplay" type="PanelContainer" parent="MainLayout/RightPanel/CurrencyContainer"]
+[node name="ObolsDisplay" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/CurrencyContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("9_utbpp")
 currency_value = 156
 
-[node name="EssenceDisplay" type="PanelContainer" parent="MainLayout/RightPanel/CurrencyContainer"]
+[node name="EssenceDisplay" type="PanelContainer" parent="MainLayout/ContentGrid/RightPanel/CurrencyContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("9_utbpp")

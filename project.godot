@@ -26,7 +26,6 @@ BossManager="*res://scripts/core/BossManager.gd"
 GridManager="*res://scripts/core/grid_manager.gd"
 GameController="*res://scripts/core/game_controller.gd"
 ScoreManager="*res://scripts/core/score_manager.gd"
-ThemeManager="*res://scripts/ui/theme_manager.gd"
 
 [display]
 

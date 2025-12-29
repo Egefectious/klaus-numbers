@@ -1,18 +1,21 @@
 extends Control
 
 # UI References
-@onready var grid_board: GridContainer = $MainLayout/CenterPanel/GridFrame/GridBoard
-@onready var bench_area: Control = $MainLayout/CenterPanel/BenchArea
-@onready var score_lbl: PanelContainer = $MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent/ScoreStat
-@onready var target_lbl: PanelContainer = $MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent/TargetStat
-@onready var round_lbl: PanelContainer = $MainLayout/RightPanel/StatsBox/StatsPanel/StatsContent/SmallStatsRow/RoundStat
-@onready var active_slab_slot: PanelContainer = $MainLayout/RightPanel/ActiveSlabSlot
+@onready var grid_board: GridContainer = $MainLayout/ContentGrid/CenterPanel/GridContainer/GridBoard
+@onready var bench_area: Control = $MainLayout/ContentGrid/CenterPanel/BenchSection/BenchArea
+@onready var score_lbl: PanelContainer = $MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/ScoreStat
+@onready var target_lbl: PanelContainer = $MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/TargetStat
+@onready var round_lbl: PanelContainer = $MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/SmallStatsRow/RoundStat
+@onready var draws_lbl: PanelContainer = $MainLayout/ContentGrid/RightPanel/StatsPanel/StatsContent/DrawsStat
+@onready var active_slab_slot: PanelContainer = $MainLayout/ContentGrid/RightPanel/ActiveSlabSlot
 
 var slab_scene = preload("res://scenes/ui/SlabUI.tscn")
 
+
+# Store references to grid buttons for easy access
+var grid_buttons: Dictionary = {}
+
 func _ready():
-	
-	ThemeManager.apply_global_theme(self)
 	# 1. Connect Managers
 	if not GridManager.is_connected("grid_generated", _on_grid_generated):
 		GridManager.connect("grid_generated", _on_grid_generated)
@@ -25,19 +28,14 @@ func _ready():
 		RunManager.connect("bench_updated", _on_bench_updated)
 	if not RunManager.is_connected("new_round_started", _on_round_update):
 		RunManager.connect("new_round_started", _on_round_update)
+	if not RunManager.is_connected("draws_changed", _on_draws_changed):
+		RunManager.connect("draws_changed", _on_draws_changed)
 		
 	if not ScoreManager.is_connected("score_calculated", _on_score_update):
 		ScoreManager.connect("score_calculated", _on_score_update)
-
-	var index = 0
-	# Loop through ALL children
-	for child in get_children():
-		# ONLY animate if it is actually a Label
-		if child is Label:
-			animate_letter(child, index * 0.1)
-			index += 1
-		
-	var actions = $MainLayout/RightPanel/ActionsBox
+	
+	# 2. Connect Buttons
+	var actions = $MainLayout/ContentGrid/RightPanel/ActionsBox
 	actions.get_node("DRAW").pressed.connect(func(): RunManager.draw_slab())
 	actions.get_node("BENCH").pressed.connect(func(): RunManager.move_holding_to_bench())
 	actions.get_node("SCORE").pressed.connect(func(): GameController._on_score_button_pressed())
@@ -49,139 +47,165 @@ func _ready():
 		_on_bench_updated(RunManager.bench)
 
 # --- VISUAL GENERATION ---
-func animate_letter(label: Label, delay: float):
-	var tween = create_tween().set_loops()
-	
-	# Wait for start delay
-	tween.tween_interval(delay)
-	
-	# Pulse effect (Glow + Scale)
-	tween.tween_property(label, "modulate:a", 1.0, 1.0)
-	tween.parallel().tween_property(label, "scale", Vector2(1.1, 1.1), 1.0).set_trans(Tween.TRANS_SINE)
-	
-	tween.tween_property(label, "modulate:a", 0.7, 1.0)
-	tween.parallel().tween_property(label, "scale", Vector2(1.0, 1.0), 1.0).set_trans(Tween.TRANS_SINE)
-	
+
 func _on_grid_generated(grid_data: Dictionary):
 	# Clear board
-	for c in grid_board.get_children(): c.queue_free()
+	for c in grid_board.get_children(): 
+		c.queue_free()
+	grid_buttons.clear()
 	
-	# Rebuild 5x5 Grid
+	# Rebuild 5x5 Grid with new button system
 	for y in range(5):
 		for x in range(5):
 			var coords = Vector2(x, y)
 			var slot_data = grid_data.get(coords)
 			
-			# UPDATE: Use a Button so we can click it!
+			# Create custom slot button
 			var slot_btn = Button.new()
-			slot_btn.custom_minimum_size = Vector2(90, 90)
+			slot_btn.set_script(slot_button_script)
+			slot_btn.setup(coords, slot_data)
 			
-			# Style it to look like a stone slot (Flat style)
-			var style = StyleBoxFlat.new()
-			style.bg_color = Color("#2b2b30") # Dark Stone
-			style.border_width_bottom = 4
-			style.border_color = Color("#444444")
-			style.corner_radius_top_left = 4
-			style.corner_radius_top_right = 4
-			style.corner_radius_bottom_right = 4
-			style.corner_radius_bottom_left = 4
-			slot_btn.add_theme_stylebox_override("normal", style)
-			slot_btn.add_theme_stylebox_override("hover", style) # Keep same style on hover
+			# Connect click signal
+			slot_btn.slot_clicked.connect(_on_grid_slot_clicked)
 			
-			# Add Target Number Label
-			var lbl = Label.new()
-			lbl.text = str(slot_data.target_number)
-			lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-			lbl.position = Vector2(0, 30) # Manually center roughly
-			lbl.custom_minimum_size = Vector2(90, 90) # Match button size to center text
-			lbl.add_theme_font_size_override("font_size", 24)
-			lbl.modulate = Color(1, 1, 1, 0.3) # Dim target number
-			# Make label 'transparent' to clicks so button catches input
-			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE 
-			
-			slot_btn.add_child(lbl)
-			
-			if slot_data.is_locked:
-				slot_btn.disabled = true
-				slot_btn.modulate = Color(0.5, 0.5, 0.5) # Dim it visualy
-				
-				# Optional: Add a lock icon if you want
-				var lock_icon = Label.new()
-				lock_icon.text = "🔒"
-				lock_icon.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-				lock_icon.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-				lock_icon.set_anchors_preset(Control.PRESET_FULL_RECT)
-				slot_btn.add_child(lock_icon)
-			
-			# CONNECT CLICK SIGNAL
-			slot_btn.pressed.connect(func(): GameController._on_grid_slot_clicked(coords))
+			# Add hover effects
+			slot_btn.mouse_entered.connect(func(): slot_btn.set_hover_effect(true))
+			slot_btn.mouse_exited.connect(func(): slot_btn.set_hover_effect(false))
 			
 			grid_board.add_child(slot_btn)
+			grid_buttons[coords] = slot_btn
 
-func _on_slab_placed(coords: Vector2, slab_data: SlabData, result: Dictionary):
-	# 1. Update the Grid Slot Visual
-	var index = (coords.y * 5) + coords.x
-	if index < grid_board.get_child_count():
-		var slot_btn = grid_board.get_child(index)
+func _on_slab_placed(coords: Vector2, slab_data, result: Dictionary):
+	# Update the specific grid slot
+	if grid_buttons.has(coords):
+		var slot_btn = grid_buttons[coords]
 		
-		# If we have data, spawn the visual
 		if slab_data != null:
-			var slab_ui = slab_scene.instantiate()
-			# Scale it down slightly to fit in the grid
-			slab_ui.scale = Vector2(0.8, 0.8) 
-			slab_ui.mouse_filter = Control.MOUSE_FILTER_IGNORE # Don't block future clicks
+			# Place the slab visual
+			slot_btn.place_slab(slab_scene, slab_data)
 			
-			slot_btn.add_child(slab_ui)
-			slab_ui.setup(slab_data)
-			
-			# Center it (Math based on 90px slot and approx 80px scaled slab)
-			slab_ui.position = Vector2(5, 0)
-			
-		# If data is null (Destroyed/Cleared), remove visuals
+			# Show score feedback
+			_show_score_feedback(coords, result)
 		else:
-			for child in slot_btn.get_children():
-				if child is SlabUI: child.queue_free()
-
-	# 2. Clear Active Slot UI if hand is empty
+			# Clear the slot
+			slot_btn.clear_slab()
+	
+	# Clear active slot UI if hand is empty
 	_check_clear_active_slot()
 
-func _on_slab_drawn(slab_data: SlabData):
+func _show_score_feedback(coords: Vector2, result: Dictionary):
+	# Create floating score text
+	if not grid_buttons.has(coords):
+		return
+		
+	var slot_btn = grid_buttons[coords]
+	var score = result.get("score", 0)
+	var score_type = result.get("type", "MISMATCH")
+	
+	# Create label
+	var score_label = Label.new()
+	score_label.text = "+%d" % score
+	score_label.add_theme_font_size_override("font_size", 24)
+	
+	# Color based on match type
+	match score_type:
+		"PERFECT":
+			score_label.add_theme_color_override("font_color", Color(1.0, 0.9, 0.2))
+		"MATCH":
+			score_label.add_theme_color_override("font_color", Color(0.3, 0.85, 1.0))
+		_:
+			score_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7))
+	
+	# Add shadow
+	score_label.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.8))
+	score_label.add_theme_constant_override("shadow_offset_x", 0)
+	score_label.add_theme_constant_override("shadow_offset_y", 2)
+	score_label.add_theme_constant_override("shadow_outline_size", 4)
+	
+	# Position above button
+	var btn_pos = slot_btn.global_position
+	score_label.global_position = btn_pos + Vector2(slot_btn.size.x / 2 - 30, -40)
+	
+	get_tree().root.add_child(score_label)
+	
+	# Animate
+	var tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(score_label, "position:y", score_label.position.y - 50, 1.0)
+	tween.tween_property(score_label, "modulate:a", 0.0, 1.0)
+	
+	await tween.finished
+	score_label.queue_free()
+
+func _on_slab_drawn(slab_data):
+	# Show in active slot
+	active_slab_slot.visible = true
+	
 	# Clear old slab
-	for c in active_slab_slot.get_children(): c.queue_free()
+	for c in active_slab_slot.get_children(): 
+		c.queue_free()
 
 	# Create new visual
 	var slab_ui = slab_scene.instantiate()
 	active_slab_slot.add_child(slab_ui)
 	slab_ui.setup(slab_data)
-	
-	# Reset position for PanelContainer
-	slab_ui.position = Vector2.ZERO 
+	slab_ui.position = Vector2.ZERO
 
 func _on_bench_updated(bench_array: Array):
-	# 1. Clear Active Slot UI if hand is empty (Moved to Bench)
+	# Clear active slot UI if hand is empty
 	_check_clear_active_slot()
 	
-	# 2. Clear bench visuals
-	for c in bench_area.get_children(): c.queue_free()
+	# Clear bench visuals
+	for c in bench_area.get_children(): 
+		c.queue_free()
 	
-	# 3. Re-fan the cards
-	var start_x = 0
+	# Create fanned bench cards
+	var start_x = bench_area.size.x / 2 if bench_area.size.x > 0 else 400
+	var card_width = 90
+	var spacing = 95
+	var total_width = (bench_array.size() - 1) * spacing
+	start_x = start_x - total_width / 2
+	
 	for i in range(bench_array.size()):
 		var slab_ui = slab_scene.instantiate()
 		bench_area.add_child(slab_ui)
 		slab_ui.setup(bench_array[i])
-		# Adjust spacing for fan
-		slab_ui.position = Vector2(start_x + (i * 90), 20)
-		slab_ui.rotation_degrees = (i - bench_array.size()/2.0) * 5 
+		
+		# Fan layout
+		var x_pos = start_x + (i * spacing)
+		var y_offset = abs(i - bench_array.size() / 2.0) * 8
+		var rotation_deg = (i - bench_array.size() / 2.0) * 4
+		
+		slab_ui.position = Vector2(x_pos, 20 + y_offset)
+		slab_ui.rotation_degrees = rotation_deg
+		slab_ui.scale = Vector2(0.9, 0.9)
+		
+		# Make clickable
+		slab_ui.mouse_filter = Control.MOUSE_FILTER_STOP
+		var index = i
+		slab_ui.gui_input.connect(func(event): _on_bench_card_clicked(event, index))
+
+func _on_bench_card_clicked(event: InputEvent, index: int):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var slab = RunManager.play_from_bench(index)
+		if slab:
+			RunManager.current_slab_holding = slab
+			_on_slab_drawn(slab)
 
 func _check_clear_active_slot():
-	# If RunManager says we aren't holding anything, clear the big preview slot
 	if RunManager.current_slab_holding == null:
-		for c in active_slab_slot.get_children(): c.queue_free()
+		active_slab_slot.visible = false
+		for c in active_slab_slot.get_children(): 
+			c.queue_free()
 
 func _on_score_update(total, breakdown):
 	score_lbl.update_value(str(total))
 
 func _on_round_update(round_num):
 	round_lbl.update_value("%d/3" % round_num)
+
+func _on_draws_changed(current: int, max_draws: int):
+	draws_lbl.update_value(str(current))
+
+func _on_grid_slot_clicked(coords: Vector2):
+	GameController._on_grid_slot_clicked(coords)
