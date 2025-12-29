@@ -10,7 +10,7 @@ extends Control
 @onready var active_slab_slot: PanelContainer = $MainLayout/ContentGrid/RightPanel/ActiveSlabSlot
 
 var slab_scene = preload("res://scenes/ui/SlabUI.tscn")
-
+var slot_button_script = preload("res://scripts/core/GridSlotButton.gd")
 
 # Store references to grid buttons for easy access
 var grid_buttons: Dictionary = {}
